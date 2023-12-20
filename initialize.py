@@ -1,27 +1,53 @@
-from llama_index import download_loader
+
 from dotenv import load_dotenv
-from llama_index.embeddings import HuggingFaceEmbedding
 from llama_index import VectorStoreIndex
 from logging_spinner import SpinnerHandler
+from llama_index.llms import OpenAI
+from llama_index.node_parser import SentenceWindowNodeParser, SimpleNodeParser
+from llama_index import ServiceContext, set_global_service_context
+from llama_index.embeddings import HuggingFaceEmbedding, OpenAIEmbedding
 import logging
 import os
-
-
 from googleDriveReader import GoogleDriveReader
-load_dotenv()
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.addHandler(SpinnerHandler())
+
+def readGoogleDrive(folder_id):
+    load_dotenv()
+
+    def get_nodes(documents, node_parser):
+        nodes = node_parser.get_nodes_from_documents(documents)
+        return nodes
 
 
-folder_id = os.getenv('FOLDER_ID')
-
-loader = GoogleDriveReader()
-
-logger.info('Loading data...', extra={'user_waiting': True})
-documents = loader.load_data(folder_id=folder_id)
-logger.info('Finished loading!', extra={'user_waiting': False})
+    node_parser = SentenceWindowNodeParser.from_defaults(
+        window_size=6, # one large document vs many little documents
+        window_metadata_key="window",
+        original_text_metadata_key="original_text",
+    )
 
 
-index = VectorStoreIndex.from_documents(documents)
-index.storage_context.persist()
+
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(SpinnerHandler())
+
+
+    folder_id = folder_id #os.getenv('FOLDER_ID')
+
+    loader = GoogleDriveReader()
+
+    logger.info('Loading data...', extra={'user_waiting': True})
+    documents = loader.load_data(folder_id=folder_id)
+    logger.info('Finished loading!', extra={'user_waiting': False})
+
+    nodes = get_nodes(documents, node_parser)
+
+
+    ctx = ServiceContext.from_defaults(
+        llm=OpenAI(model="gpt-3.5-turbo", temperature=0),
+        embed_model=OpenAIEmbedding(embed_batch_size=50))
+
+
+    index = VectorStoreIndex(nodes, service_context=ctx)
+    index.storage_context.persist()
+
+    return index
