@@ -10,6 +10,25 @@ from llama_index import ServiceContext, set_global_service_context
 from llama_index import StorageContext, load_index_from_storage
 import asyncio
 import numpy as np
+
+
+
+# Currently not finished working
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 from llama_index.evaluation import (
     CorrectnessEvaluator,
     SemanticSimilarityEvaluator,
@@ -35,7 +54,7 @@ load_dotenv()
 
 
 node_parser = SentenceWindowNodeParser.from_defaults(
-    window_size=6, # one large document vs many little documents
+    window_size=3, # one large document vs many little documents
     window_metadata_key="window",
     original_text_metadata_key="original_text",
 )

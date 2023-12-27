@@ -6,19 +6,36 @@ import logging
 import streamlit as st
 from initialize import readGoogleDrive
 import sys
+from llama_index.query_engine import RetryQueryEngine
+from llama_index.evaluation import RelevancyEvaluator
 
-
-def handle_user_input(query):
+def handle_user_input(query, top_k):
+    print(top_k)
     query_engine = st.session_state.index.as_query_engine(
-        similarity_top_k = 2,
+        similarity_top_k = top_k,
         node_postprocessors =  [MetadataReplacementPostProcessor(target_metadata_key="window")]
     )
 
+    query_response_evaluator = RelevancyEvaluator()
+    retry_query_engine = RetryQueryEngine(
+        query_engine, query_response_evaluator
+    )
 
-    response = query_engine.query(query)
+    response = retry_query_engine.query(query)
     
-    st.write(response)        
-    
+    st.markdown(response)       
+    st.markdown('----------------------------------------------')
+    st.markdown('**Evidence:**')
+    for i in range(len(response.source_nodes)):        
+        window = response.source_nodes[i].node.metadata["window"]
+        sentence = response.source_nodes[i].node.metadata["original_text"]
+
+        st.markdown(f"**Retrieved Sentence:** {sentence}")
+        st.markdown('----------------------------------------------')
+        
+        st.markdown(f"**Window around Sentence:** {window}") 
+        st.markdown('----------------------------------------------')
+        
   
 
    #     with open("log/q&a.csv", "a") as log:
@@ -38,12 +55,12 @@ def main():
         st.session_state.index = None
 
     st.header("Chat with Google Drive :books:")
-
+    top_k = st.sidebar.slider("Top K:", 1, 10, 4)
     user_question = st.text_input("Ask a question:")
     
     if user_question:
         if st.session_state.index:        
-            handle_user_input(user_question)
+            handle_user_input(user_question, top_k)
         else:
             st.write("Please enter your Google Drive ID first")
     with st.sidebar:
