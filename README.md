@@ -1,4 +1,9 @@
 
+# Google Drive RAG 
+
+Allows to perform queries over documents on the google drive using LLM 
+
+
 ## Run Locally
 
 Clone the project
@@ -52,3 +57,9 @@ To run the project:
   streamlit run query.py
 ```
 
+
+## Usage
+
+Google Folder ID can be extracted from the drive URL.
+
+For example, the folder_id of `https://drive.google.com/drive/folders/1w7XryYu6mL9VLmfyqUkA4_fRnDbsCqV-` is `1w7XryYu6mL9VLmfyqUkA4_fRnDbsCqV-`.
