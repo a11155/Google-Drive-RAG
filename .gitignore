@@ -1,6 +1,5 @@
 .env
 /storage
-/Google Drive Reader
 credentials.json
 eval_qr_dataset.json
 log/q&a.csv

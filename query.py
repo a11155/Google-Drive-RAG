@@ -37,9 +37,9 @@ def handle_user_input(query, top_k):
         st.markdown('----------------------------------------------')
         
   
-
-   #     with open("log/q&a.csv", "a") as log:
-  #          log.write(f'{question},"{response}"\n')
+    # To log the questions and answers uncomment the following lines:
+    #     with open("log/q&a.csv", "a") as log:
+    #         log.write(f'{question},"{response}"\n')
 
 
 def main():
@@ -70,9 +70,12 @@ def main():
         if st.button("Process"):
 
             with st.spinner("Processing"):
-                #storage_context = StorageContext.from_defaults(persist_dir ="./storage")
-                #load_index_from_storage(storage_context)
+         
                 st.session_state.index = readGoogleDrive(folder_id)
+
+                # To use existing database uncomment the following lines
+                #storage_context = StorageContext.from_defaults(persist_dir ="./storage")
+                #st.session_state.index load_index_from_storage(storage_context)
 
 
     
