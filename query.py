@@ -62,10 +62,10 @@ def main():
         if st.session_state.index:        
             handle_user_input(user_question, top_k)
         else:
-            st.write("Please enter your Google Drive ID first")
+            st.write("Please enter your Google Folder ID first")
     with st.sidebar:
-        st.subheader("Your Google Drive ID")
-        folder_id = st.text_input("Enter your Google Drive ID:")
+        st.subheader("Your Google Folder ID")
+        folder_id = st.text_input("Enter your Google Folder ID:")
 
         if st.button("Process"):
 
